@@ -1,12 +1,33 @@
 import requests
 
-def getGithubUserInfo(username):
-  url = f"https://api.github.com/users/{username}"
-  response = requests.get(url)
+class GitHubUser:
+  def __init__(self, username):
+    self.username = username
+    self.baseUrl = f"https://api.github.com/users"
+  
+  def getUserInfo(self):
+    url = f"{self.baseUrl}/{self.username}"
+    response = requests.get(url)
 
-  if response.status_code == 200:
-    user = response.json()
-    print(f"Kullanıcı Adı: {user['login']}")
+    if response.status_code == 200:
+      user = response.json()
+      self.printUserInfo(user)
+    else:
+      print(f"Hata: {self.username} için kullanıcı bilgileri getirilemiyor")
+
+  def getRepos(self):
+    url = f"{self.baseUrl}/{self.username}/repos"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+      repos = response.json()
+      self.printRepos(repos)
+    else:
+      print(f"Hata: {self.username} kullanıcısı için repolar getirilemiyor")
+
+  @staticmethod
+  def printUserInfo(user):
+    print(f"\nKullanıcı Adı: {user['login']}")
     print(f"Tam Adı: {user['name']}")
     print(f"Profil URL: {user['html_url']}")
     print(f"Takipçi Sayısı: {user['followers']}")
@@ -17,29 +38,21 @@ def getGithubUserInfo(username):
     print(f"Blog: {user['blog']}")
     print(f"Email: {user['email']}")
     print("-" * 41)
-  else:
-    print(f"Hata: {username} için kullanıcı bilgileri getirilemiyor")
 
-def getGithubRepos(username):
-  url = f"https://api.github.com/users/{username}/repos"
-  response = requests.get(url)
-
-  if response.status_code == 200:
-    repos = response.json()
+  @staticmethod
+  def printRepos(repos):
     for repo in repos:
-      print(f"Repo Adı: {repo['name']}")
+      print(f"\nRepo Adı: {repo['name']}")
       print(f"Açıklama: {repo['description']}")
       print(f"HTML URL: {repo['html_url']}")
       print(f"Yıldız Sayısı: {repo['stargazers_count']}")
       print(f"Çatallanma Sayısı: {repo['forks_count']}")
       print(f"Açık Konu (issue) Sayısı: {repo['open_issues_count']}")
       print(f"Programlama Dili: {repo['language']}")
-      print(f"Lisans: {repo['licence']['name'] if repo['licence'] else 'Lisans yok'}")
+      print(f"Lisans: {repo['license']['name'] if repo['license'] else 'Lisans yok'}")
       print(f"Oluşturulma Tarihi: {repo['created_at']}")
       print(f"Güncellenme Tarihi: {repo['updated_at']}")
       print("-" * 41)
-  else:
-    print(f"Hata: {username} kullanıcısı için repolar getirilemiyor")
 
 def main():
   while True:
@@ -50,12 +63,14 @@ def main():
 
     choice = input("Seçiminizi girin (1/2/3): ")
 
-    if choice == '1':
+    if choice in ['1', '2']:
       githubUsername = input("GitHub kullanıcı adını girin: ")
-      getGithubUserInfo(githubUsername)
-    elif choice == '2':
-      githubUsername = input("GitHub kullanıcı adını girin: ")
-      getGithubRepos(githubUsername)
+      user = GitHubUser(githubUsername)
+    
+      if choice == '1':
+        user.getUserInfo()
+      elif choice == '2':
+        user.getRepos()
     elif choice == '3':
       print("Çıkış yapılıyor...")
       break
