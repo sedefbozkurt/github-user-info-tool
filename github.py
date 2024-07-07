@@ -61,8 +61,8 @@ class GitHubUser:
 
   @staticmethod
   def writeToFile(fileName, data):
-    with open(fileName, 'w') as f:
-      json.dump(data, f, indent=3)
+    with open(fileName, 'w', encoding='utf-8') as f:
+      json.dump(data, f, indent=3, ensure_ascii=False)
     print(f"Veriler {fileName} dosyasına yazıldı")
 
   @staticmethod
